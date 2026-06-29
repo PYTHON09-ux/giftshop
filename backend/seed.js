@@ -4,7 +4,7 @@ const Admin = require('./src/models/Admin');
 const Category = require('./src/models/Category');
 const Product = require('./src/models/Product');
 
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/giftshop';
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://admin:4xYRYyqCL8laaRQd@cluster0.1lrgq1c.mongodb.net/';
 
 const categories = [
   {
@@ -153,7 +153,7 @@ const sampleProducts = [
 ];
 
 async function seed() {
-  await mongoose.connect(process.env.MONGODB_URI);
+  await mongoose.connect(MONGO_URI); // ← this was missing
   console.log('Connected to MongoDB');
 
   const existing = await Admin.findOne({ email: 'admin@giftshopie.com' });
