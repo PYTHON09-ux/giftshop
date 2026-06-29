@@ -153,7 +153,7 @@ const sampleProducts = [
 ];
 
 async function seed() {
-  await mongoose.connect(MONGO_URI);
+  await mongoose.connect(process.env.MONGODB_URI);
   console.log('Connected to MongoDB');
 
   const existing = await Admin.findOne({ email: 'admin@giftshopie.com' });
