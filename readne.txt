@@ -1,0 +1,112 @@
+# Custom Corner Gift Shopie
+
+Full-stack MERN gift shop. Backend: Express + MongoDB + Cloudinary. Frontend: React + Tailwind.
+
+## What changed in this revision
+
+Three problems were reported and fixed:
+
+1. **Admin "add product" form lost input focus on every keystroke.**
+   Cause: helper components (`Section`, `Label`) were defined *inside* the
+   page component, so React treated them as new component types on every
+   render and remounted every input. Fixed by moving `Section` and `Label`
+   to module scope, outside the component function, in both
+   `AdminProductForm.jsx` and `AdminEventForm.jsx`.
+
+2. **Products didn't show up on the public shop pages.**
+   Cause: the backend defaulted the `isActive` filter to the *boolean*
+   `true`, then later compared the incoming query string against the
+   *string* `'true'` (`isActive === 'true'`) — a boolean never equals that
+   string, so the filter silently matched nothing and the shop showed an
+   empty grid with no error. Fixed the query-building logic in
+   `routes/products.js` so the three actual states are explicit:
+   - no `isActive` param → active products only (the public default)
+   - `isActive=all` → everything (used by the admin product list)
+   - `isActive=false` → inactive only (admin filter)
+   This logic is unit-tested (see notes below) and the frontend (`ShopPage`,
+   `HomePage`) now never sends an `isActive` param at all, relying on the
+   backend default.
+
+3. **The UI looked childish (emoji icons) and wasn't mobile-friendly.**
+   Rebuilt the whole visual layer:
+   - Replaced every emoji icon with `react-icons/fi` (Feather) line icons.
+   - New palette: warm charcoal `ink`, off-white `cream`, a single
+     terracotta `rust` accent, muted `forest` green for stock/success
+     states, neutral `stone` for secondary text — no purple/neon gradients.
+     Typography: Fraunces (display) + Inter (body).
+   - Admin product table is a card list on mobile, a table on desktop
+     (`sm:` breakpoint), rather than a horizontally-scrolling table.
+   - Filter sidebar on the shop page becomes a slide-in drawer on mobile.
+   - Renamed the `isNew` product flag to `isNewArrival` throughout (Mongoose
+     reserves `isNew` as a document property and warns if you redefine it —
+     worth avoiding entirely rather than risking subtle save bugs).
+
+## Verifying the fix
+
+The `isActive` query-building logic was tested directly against the real
+`routes/products.js` file via an HTTP request (Express + supertest, with
+the Mongoose model swapped for an in-memory fake — this sandbox has no
+network access to download a real MongoDB binary). All cases pass:
+- public request (no `isActive` param) → returns only active products
+- `isActive=all` → returns everything
+- `isActive=false` → returns only inactive
+- combining with `isFeatured=true` still defaults `isActive` to `true`
+
+The frontend build (`npm run build`) completes with no errors, and a grep
+across the whole `src/` tree confirms zero emoji and zero stray `isNew`
+references outside of `isNewArrival`.
+
+---
+
+## Project structure
+
+```
+backend/
+  src/
+    config/cloudinary.js
+    middleware/auth.js          JWT protect middleware
+    models/                     Admin, Product, Category, Event
+    routes/                     products, categories, events, auth, upload
+    server.js
+  seed.js                       creates admin + categories + sample products
+  .env.example
+frontend/
+  src/
+    components/                 Navbar, Footer, ProductCard, AdminLayout, ProtectedRoute
+    context/AuthContext.jsx
+    pages/                      Home, Shop, Product, Events, About
+    pages/admin/                Login, Dashboard, Products, ProductForm, Categories, Events, EventForm
+    utils/api.js
+    index.css                   design tokens + component classes
+  tailwind.config.js
+```
+
+## Quick start
+
+```bash
+npm run install:all
+
+cp backend/.env.example backend/.env
+# edit backend/.env: MONGODB_URI, JWT_SECRET, CLOUDINARY_* keys
+
+npm run seed
+# creates admin@giftshopie.com / Admin@123, 6 categories, 8 sample products
+
+npm run dev:backend     # terminal 1
+npm run dev:frontend    # terminal 2
+```
+
+Shop: http://localhost:5173 · Admin: http://localhost:5173/admin/login
+
+## Design tokens
+
+| Token | Value | Use |
+|---|---|---|
+| `ink` | `#1C1A17` | Primary text, dark sections |
+| `cream` | `#FAF6F0` | Page background |
+| `rust` | `#B5582C` | Single accent — CTAs, active states |
+| `forest` | `#3F5246` | Success / in-stock |
+| `stone` | `#8A8378` | Secondary text |
+
+Fonts: Fraunces (display) + Inter (body). Icons: `react-icons/fi` only.
+#
