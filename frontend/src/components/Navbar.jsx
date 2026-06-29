@@ -40,7 +40,7 @@ export default function Navbar() {
               <FiGift className="text-cream text-base" />
             </span>
             <span className="flex flex-col leading-none">
-              <span className="font-display font-semibold text-ink text-base">Custom Corner</span>
+              <span className="font-display font-semibold text-white text-base">Custom Corner</span>
               <span className="text-rust text-[10px] font-semibold uppercase tracking-wider2">Gift Shopie</span>
             </span>
           </Link>
