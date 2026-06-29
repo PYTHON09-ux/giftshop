@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: '/api' });
+const API = axios.create({ baseURL: 'https://giftshop-649a.vercel.app/api' });
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('adminToken');
