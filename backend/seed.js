@@ -4,7 +4,9 @@ const Admin = require('./src/models/Admin');
 const Category = require('./src/models/Category');
 const Product = require('./src/models/Product');
 
-const MONGO_URI = process.env.MONGODB_URI;
+
+const MONGO_URI = process.env.MONGODB_URI; 
+
 
 const categories = [
   {
