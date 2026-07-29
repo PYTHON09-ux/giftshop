@@ -59,7 +59,7 @@ const INSTAGRAM_HANDLE = 'custom_corner.1';
 const INSTAGRAM_LINK = `https://instagram.com/${INSTAGRAM_HANDLE}`;
 
 /* TODO: swap for real assets */
-const SHOWCASE_VIDEO_SRC = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+const SHOWCASE_VIDEO_SRC = 'https://www.pexels.com/download/video/6275428/';
 const SHOWCASE_VIDEO_POSTER = 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=1200&h=1500&fit=crop';
 const INSTAGRAM_PREVIEW_IMAGES = [
   'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=400&h=400&fit=crop',
