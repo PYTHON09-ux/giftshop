@@ -606,7 +606,7 @@ export default function HomePage() {
         <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div ref={heroTextRef} style={{ opacity: 0 }}>
             <GiftTag size="sm" bg="#fff" color={C.coral} rotate={-3} className="mb-5 shadow-sm" style={{ border: `1px solid ${C.line}` }}>
-              🎁 Custom Corner Gift Shopie
+              🎁utkarsh Gift Shopie
             </GiftTag>
             <h1 style={{ fontFamily: F_DISPLAY, color: C.ink }} className="font-semibold text-[2.3rem] sm:text-5xl lg:text-[3.4rem] leading-[1.08] mb-3">
               Gifts chosen with the<br className="hidden sm:block" /> same care{' '}
