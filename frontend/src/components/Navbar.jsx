@@ -215,10 +215,10 @@ export default function Navbar() {
             })}
           </div>
 
-          <Tag to="/admin" bg={C.ink} color="#fff" rotate={0} className="w-full justify-center"
+          {/* <Tag to="/admin" bg={C.ink} color="#fff" rotate={0} className="w-full justify-center"
             style={{ padding: '13px 22px 13px 30px', fontSize: 14 }}>
             Admin panel
-          </Tag>
+          </Tag> */}
         </div>
       )}
 
