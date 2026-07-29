@@ -2,7 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getProducts, getCategories, getEvents } from '../utils/api';
 import ProductCard from '../components/ProductCard';
-import { FiArrowRight, FiTruck, FiRefreshCw, FiShield } from 'react-icons/fi';
+import {
+  FiArrowRight, FiTruck, FiRefreshCw, FiShield,
+  FiPlay, FiPause, FiVolume2, FiVolumeX, FiInstagram, FiMaximize,
+} from 'react-icons/fi';
 
 /* ─────────────────────────────────────────────
    External libs loaded once via <script> tags
@@ -16,6 +19,24 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const OCCASIONS = ['Birthday', 'Anniversary', 'Wedding', 'New baby', "Valentine's", 'Diwali', 'Housewarming', 'Just because'];
+
+/* ── Social handles (edit here, used everywhere below) ── */
+const WHATSAPP_NUMBER = '919146609265';
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi, I'd like to enquire about a gift!")}`;
+const INSTAGRAM_HANDLE = 'custom_corner.1';
+const INSTAGRAM_LINK = `https://instagram.com/${INSTAGRAM_HANDLE}`;
+
+/* TODO: swap these placeholders for real assets once ready */
+const SHOWCASE_VIDEO_SRC = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+const SHOWCASE_VIDEO_POSTER = 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=1200&h=1500&fit=crop';
+const INSTAGRAM_PREVIEW_IMAGES = [
+  'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?w=400&h=400&fit=crop',
+  'https://images.unsplash.com/photo-1573883430697-4c3479ba619d?w=400&h=400&fit=crop',
+];
 
 /* ── Floating particles canvas ── */
 function ParticleCanvas() {
@@ -49,7 +70,6 @@ function ParticleCanvas() {
         ctx.fillStyle = `rgba(181,88,44,${p.o})`;
         ctx.fill();
       });
-      // draw thin connecting lines
       particles.forEach((a, i) => {
         particles.slice(i + 1).forEach(b => {
           const dx = a.x - b.x, dy = a.y - b.y;
@@ -157,7 +177,7 @@ function Counter({ to, suffix = '' }) {
   return <span ref={elRef}>0{suffix}</span>;
 }
 
-/* ── Floating WhatsApp FAB ── */
+/* ── Floating WhatsApp / Instagram FAB ── */
 function FloatingFAB() {
   const [open, setOpen] = useState(false);
   return (
@@ -168,7 +188,14 @@ function FloatingFAB() {
         pointerEvents: open ? 'auto' : 'none',
         transition: 'opacity 0.22s ease, transform 0.22s ease',
       }} className="flex flex-col items-end gap-2">
-        <a href="https://wa.me/919146609265?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20a%20gift!"
+        <a href={INSTAGRAM_LINK}
+          target="_blank" rel="noopener noreferrer"
+          className="flex items-center gap-2.5 text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-lg hover:brightness-110 transition-all"
+          style={{ background: 'linear-gradient(135deg,#f58529,#dd2a7b,#8134af)' }}>
+          <FiInstagram size={16} />
+          @{INSTAGRAM_HANDLE}
+        </a>
+        <a href={WHATSAPP_LINK}
           target="_blank" rel="noopener noreferrer"
           className="flex items-center gap-2.5 bg-[#25D366] text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-lg hover:brightness-110 transition-all">
           <svg viewBox="0 0 24 24" width="17" height="17" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.553 4.118 1.52 5.847L0 24l6.335-1.497A11.96 11.96 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.012-1.373l-.36-.214-3.727.88.94-3.633-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
@@ -193,6 +220,194 @@ function FloatingFAB() {
         </svg>
       </button>
     </div>
+  );
+}
+
+/* ── Gift showcase video (autoplay-in-view, tap to unmute / fullscreen) ── */
+function VideoShowcase() {
+  const wrapRef = useReveal({ y: 30 });
+  const videoRef = useRef(null);
+  const containerRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    const video = videoRef.current;
+    if (!el || !video) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().then(() => setPlaying(true)).catch(() => {});
+        } else {
+          video.pause();
+          setPlaying(false);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) { video.play(); setPlaying(true); }
+    else { video.pause(); setPlaying(false); }
+  };
+
+  const toggleMute = (e) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setMuted(video.muted);
+  };
+
+  const goFullscreen = (e) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.requestFullscreen) video.requestFullscreen();
+    else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+    video.muted = false;
+    setMuted(false);
+  };
+
+  return (
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <div ref={wrapRef} style={{ opacity: 0 }} className="grid lg:grid-cols-2 gap-8 lg:gap-14 items-center">
+        <div>
+          <span className="section-label">Take a look</span>
+          <h2 className="section-heading mt-1 mb-4">From box to "wow"</h2>
+          <p className="text-stone-dark text-sm sm:text-base leading-relaxed mb-6 max-w-md">
+            Every order is wrapped, packed and finished by hand. Here's a peek at what actually
+            shows up on someone's doorstep.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link to="/shop" className="btn-accent group">
+              Shop the collection
+              <FiArrowRight className="transition-transform group-hover:translate-x-1" />
+            </Link>
+            <a href={INSTAGRAM_LINK} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 border border-ink/15 text-ink font-medium text-sm px-5 py-3 rounded-md hover:border-rust/50 hover:text-rust transition-all">
+              <FiInstagram /> More on Instagram
+            </a>
+          </div>
+        </div>
+
+        <div
+          ref={containerRef}
+          onClick={togglePlay}
+          className="relative rounded-2xl overflow-hidden shadow-card-hover ring-1 ring-ink/10 bg-ink
+            aspect-[9/13] sm:aspect-[4/5] lg:aspect-[3/4] max-w-sm mx-auto lg:max-w-none w-full cursor-pointer group"
+        >
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover"
+            src={SHOWCASE_VIDEO_SRC}
+            poster={SHOWCASE_VIDEO_POSTER}
+            muted={muted}
+            loop
+            playsInline
+            preload="metadata"
+          />
+
+          {/* gradient for control legibility */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10 pointer-events-none" />
+
+          {/* center play/pause */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className={`w-16 h-16 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-xl
+              transition-all duration-300 ${playing ? 'opacity-0 scale-75 group-hover:opacity-100' : 'opacity-100 scale-100'}`}>
+              {playing ? <FiPause className="text-ink text-2xl" /> : <FiPlay className="text-ink text-2xl ml-0.5" />}
+            </div>
+          </div>
+
+          {/* bottom controls */}
+          <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+            <span className="pill" style={{ background: 'rgba(0,0,0,0.5)', color: '#FAF6F0' }}>
+              Gift unboxing
+            </span>
+            <div className="flex gap-2">
+              <button onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'}
+                className="w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/65 transition-colors">
+                {muted ? <FiVolumeX size={15} /> : <FiVolume2 size={15} />}
+              </button>
+              <button onClick={goFullscreen} aria-label="Fullscreen"
+                className="w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/65 transition-colors">
+                <FiMaximize size={15} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── WhatsApp + Instagram connect band ── */
+function ConnectSection() {
+  const ref = useStagger('.stagger-child', 0.12);
+  return (
+    <section className="bg-cream-dark border-y border-ink/10 py-14 sm:py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-9 sm:mb-12">
+          <span className="section-label">Stay close</span>
+          <h2 className="section-heading mt-1">Chat with us, follow along</h2>
+          <p className="text-stone-dark text-sm sm:text-base mt-3 max-w-md mx-auto">
+            Fastest replies on WhatsApp. Prettiest updates on Instagram.
+          </p>
+        </div>
+
+        <div ref={ref} className="grid sm:grid-cols-2 gap-5 sm:gap-6 mb-10">
+          {/* WhatsApp card */}
+          <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer"
+            className="stagger-child card-surface p-6 sm:p-8 flex items-center gap-5
+              hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 group">
+            <div className="w-14 h-14 shrink-0 rounded-2xl bg-[#25D366]/12 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.124.553 4.118 1.52 5.847L0 24l6.335-1.497A11.96 11.96 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.012-1.373l-.36-.214-3.727.88.94-3.633-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-display font-medium text-ink text-lg mb-0.5">Message us on WhatsApp</h3>
+              <p className="text-stone-dark text-sm">Get gift ideas, check stock, or place a custom order</p>
+            </div>
+            <FiArrowRight className="text-stone shrink-0 group-hover:translate-x-1 group-hover:text-[#25D366] transition-all" />
+          </a>
+
+          {/* Instagram card */}
+          <a href={INSTAGRAM_LINK} target="_blank" rel="noopener noreferrer"
+            className="stagger-child card-surface p-6 sm:p-8 flex items-center gap-5
+              hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 group">
+            <div className="w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg,rgba(245,133,41,0.14),rgba(221,42,123,0.14),rgba(129,52,175,0.14))' }}>
+              <FiInstagram size={24} style={{ color: '#dd2a7b' }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-display font-medium text-ink text-lg mb-0.5">@{INSTAGRAM_HANDLE}</h3>
+              <p className="text-stone-dark text-sm">Unboxings, new drops, and gifting inspiration</p>
+            </div>
+            <FiArrowRight className="text-stone shrink-0 group-hover:translate-x-1 group-hover:text-[#dd2a7b] transition-all" />
+          </a>
+        </div>
+
+        {/* Instagram preview strip */}
+        <div className="stagger-child grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3">
+          {INSTAGRAM_PREVIEW_IMAGES.map((src, i) => (
+            <a key={i} href={INSTAGRAM_LINK} target="_blank" rel="noopener noreferrer"
+              className="relative aspect-square rounded-lg sm:rounded-xl overflow-hidden group">
+              <img src={src} alt="" loading="lazy"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/25 transition-colors duration-300
+                flex items-center justify-center">
+                <FiInstagram className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={18} />
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -289,10 +504,11 @@ export default function HomePage() {
                 Shop the collection
                 <FiArrowRight className="transition-transform group-hover:translate-x-1" />
               </Link>
-              <Link to="/shop?isNewArrival=true"
+              <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 border border-cream/20 text-cream/80 font-medium text-sm px-6 py-3 rounded-md hover:bg-cream/8 hover:border-cream/35 transition-all">
-                New arrivals
-              </Link>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.124.553 4.118 1.52 5.847L0 24l6.335-1.497A11.96 11.96 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.012-1.373l-.36-.214-3.727.88.94-3.633-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
+                Chat on WhatsApp
+              </a>
             </div>
 
             {/* stats */}
@@ -353,11 +569,14 @@ export default function HomePage() {
             0%, 100% { transform: translateY(0); opacity: 0.8; }
             50% { transform: translateY(4px); opacity: 0.3; }
           }
+          @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+          }
         `}</style>
       </section>
 
       {/* ══════════ TRUST STRIP ══════════ */}
-      {/* <section className="border-b border-ink/10 bg-white">
+      <section className="border-b border-ink/10 bg-white">
         <div ref={trustRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 grid grid-cols-3 gap-2 sm:gap-6">
           {[
             [FiTruck, 'Tracked shipping', 'Every order'],
@@ -375,7 +594,7 @@ export default function HomePage() {
             </div>
           ))}
         </div>
-      </section> */}
+      </section>
 
       {/* ══════════ OCCASIONS ══════════ */}
       <section className="py-5 sm:py-7 bg-cream-dark border-b border-ink/10">
@@ -386,7 +605,7 @@ export default function HomePage() {
               <Link key={o} to={`/shop?occasion=${encodeURIComponent(o)}`}
                 className="stagger-child shrink-0 bg-white border border-ink/10
                   hover:border-rust hover:text-rust hover:shadow-sm
-                  active:scale-95 rounded-full px-4 py-2 text-sm text-ink/70
+                  active:scale-95 rounded-full px-4 py-2.5 sm:py-2 text-sm text-ink/70
                   transition-all whitespace-nowrap">
                 {o}
               </Link>
@@ -394,6 +613,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ══════════ VIDEO SHOWCASE ══════════ */}
+      <VideoShowcase />
 
       {/* ══════════ EVENTS ══════════ */}
       {events.length > 0 && (
@@ -544,6 +766,9 @@ export default function HomePage() {
         </section>
       )}
 
+      {/* ══════════ CONNECT (WHATSAPP + INSTAGRAM) ══════════ */}
+      <ConnectSection />
+
       {/* ══════════ CTA ══════════ */}
       <section className="bg-ink py-14 sm:py-20 overflow-hidden relative">
         {/* subtle shimmer ring */}
@@ -561,9 +786,15 @@ export default function HomePage() {
           <p className="text-cream/55 mb-8 text-sm sm:text-base max-w-sm mx-auto">
             Tell us the occasion and the person — we'll help put something together that fits.
           </p>
-          <a href="mailto:hello@customcornershopie.com" className="btn-accent">
-            Get in touch
-          </a>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="btn-accent justify-center">
+              Chat on WhatsApp
+            </a>
+            <a href="mailto:hello@customcornershopie.com"
+              className="inline-flex items-center justify-center gap-2 border border-cream/20 text-cream/80 font-medium text-sm px-6 py-3 rounded-md hover:bg-cream/8 hover:border-cream/35 transition-all">
+              Email us instead
+            </a>
+          </div>
         </div>
       </section>
     </div>
