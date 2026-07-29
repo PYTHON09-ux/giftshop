@@ -70,7 +70,7 @@ const INSTAGRAM_PREVIEW_IMAGES = [
   'https://images.unsplash.com/photo-1573883430697-4c3479ba619d?w=400&h=400&fit=crop',
 ];
 const HERO_PHOTOS = [
-  'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=500&h=600&fit=crop',
+  'https://plus.unsplash.com/premium_photo-1665423291662-89cb2404392b?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   'https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=500&h=600&fit=crop',
   'https://images.unsplash.com/photo-1707944145479-12755f0434d8?q=80&w=600&auto=format&fit=crop',
 ];
@@ -635,8 +635,8 @@ export default function HomePage() {
             <div ref={heroStatsRef} className="flex gap-7 sm:gap-10 mt-11 pt-7"
               style={{ opacity: 0, borderTop: `1.5px dashed ${C.line}` }}>
               {[
-                [500, '+', 'Products'],
-                [10000, '+', 'Happy customers'],
+                [50, '+', 'Products'],
+                [1000, '+', 'Happy customers'],
                 [null, '4.9★', 'Avg. rating'],
               ].map(([n, sfx, label]) => (
                 <div key={label}>
