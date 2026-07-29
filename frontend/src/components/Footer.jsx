@@ -129,6 +129,7 @@ export default function Footer() {
         <div className="mt-10 pt-6 flex flex-col sm:flex-row justify-between gap-3 text-xs"
           style={{ borderTop: `1.5px dashed ${C.line}`, color: C.inkFaint }}>
           <p>© 2025 Custom Corner Gift Shopie. All rights reserved.</p>
+          <p>Made with ❤️ by Pavan</p>
           <Link to="/admin" className="transition-colors" style={{ color: C.inkFaint }}
             onMouseEnter={e => (e.currentTarget.style.color = C.ink)}
             onMouseLeave={e => (e.currentTarget.style.color = C.inkFaint)}>
